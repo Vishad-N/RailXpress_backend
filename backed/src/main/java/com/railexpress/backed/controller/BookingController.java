@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.railexpress.backed.repository.StatusUpdateRepository;
+import com.railexpress.backed.model.StatusUpdate;
 
 import java.util.Base64;
 import java.util.List;
@@ -28,13 +30,16 @@ public class BookingController {
     private final BookingService bookingService;
     private final FileStorageService fileStorage;
     private final EmailService emailService;
+    private final StatusUpdateRepository statusRepo;
 
     public BookingController(BookingService bookingService,
                              FileStorageService fileStorage,
-                             EmailService emailService) {
+                             EmailService emailService,
+                            StatusUpdateRepository statusRepo) {
         this.bookingService = bookingService;
         this.fileStorage = fileStorage;
         this.emailService = emailService;
+        this.statusRepo = statusRepo;
     }
 
     @PostMapping("/estimate")
@@ -46,6 +51,20 @@ public class BookingController {
     public ResponseEntity<?> createBooking(@RequestBody BookingRequest req) {
         try {
             Booking created = bookingService.createBooking(req);
+            StatusUpdate initialStatus = new StatusUpdate();
+
+        initialStatus.setBookingId(savedBooking.getId());
+
+        initialStatus.setBookingRef(savedBooking.getBookingRef());
+
+        initialStatus.setStatus("Order Accepted");
+
+        initialStatus.setLocation(savedBooking.getDepartureStation());
+
+        initialStatus.setNotes("Your luggage order has been accepted.");
+        
+
+        statusRepo.save(initialStatus);
 
             // create QR payload
             Map<String, Object> qrPayload = Map.of(
