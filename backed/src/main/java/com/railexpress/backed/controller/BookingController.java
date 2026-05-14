@@ -53,13 +53,13 @@ public class BookingController {
             Booking created = bookingService.createBooking(req);
             StatusUpdate initialStatus = new StatusUpdate();
 
-        initialStatus.setBookingId(savedBooking.getId());
+        initialStatus.setBookingId(created.getId());
 
-        initialStatus.setBookingRef(savedBooking.getBookingRef());
+        initialStatus.setBookingRef(created.getBookingRef());
 
         initialStatus.setStatus("Order Accepted");
 
-        initialStatus.setLocation(savedBooking.getDepartureStation());
+        initialStatus.setLocation(created.getDepartureStation());
 
         initialStatus.setNotes("Your luggage order has been accepted.");
         
